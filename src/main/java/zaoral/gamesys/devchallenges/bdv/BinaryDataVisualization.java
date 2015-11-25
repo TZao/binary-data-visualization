@@ -9,11 +9,15 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static zaoral.gamesys.devchallenges.bdv.ColourDecoder.COLOUR;
 import static zaoral.gamesys.devchallenges.bdv.PathAlgorithm.DIAGONAL;
 
@@ -26,7 +30,10 @@ public class BinaryDataVisualization extends Application {
 
     @Override
     public void start(Stage stage) throws FileNotFoundException {
-        final Setup setup = new Setup(COLOUR, DIAGONAL, readFileFromParameters(), 6, 100);
+        final File file = readFileFromParameters();
+        final List<Boolean> bits = readBits(file);
+
+        final Setup setup = new Setup(COLOUR, DIAGONAL, bits, 6, 100);
         final Stage view = getView(stage, setup);
         view.show();
     }
@@ -58,5 +65,19 @@ public class BinaryDataVisualization extends Application {
             throw new IllegalArgumentException("First argument must be a file with readable data.");
         }
         return new File(parameters.get(0));
+    }
+
+    private List<Boolean> readBits(File file) {
+        final List<Boolean> bits = new LinkedList<>();
+        try (FileReader reader = new FileReader(file)) {
+            int c;
+            while ((c = reader.read()) != -1) {
+                bits.add(c == '1');
+            }
+            return bits;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return emptyList();
     }
 }
