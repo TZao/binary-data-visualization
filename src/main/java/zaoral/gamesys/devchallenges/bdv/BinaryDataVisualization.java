@@ -55,7 +55,7 @@ public class BinaryDataVisualization extends Application {
 
     private List<Canvas> paintCanvases(List<Boolean> bits) {
         final AtomicInteger paintedCanvases = new AtomicInteger();
-        return DemoColours.stream().parallel().flatMap(colourDecoder ->
+        return ColourDecoder.stream().parallel().flatMap(colourDecoder ->
                 PathAlgorithm.stream().parallel().flatMap(pathAlgorithm ->
                         BLOCK_SIZES.stream().map(blockSize -> {
                             out.printf("%.1f %%\n", getPercentagePainted(paintedCanvases));
