@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
@@ -21,13 +22,14 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static javafx.application.Platform.runLater;
 import static zaoral.gamesys.devchallenges.bdv.Utils.blocks;
+import static zaoral.gamesys.devchallenges.bdv.Utils.getPercentagePainted;
 import static zaoral.gamesys.devchallenges.bdv.Utils.readBits;
 import static zaoral.gamesys.devchallenges.bdv.Utils.readFileFromParameters;
 
 public class BinaryDataVisualization extends Application {
     public static final int CANVAS_SIZE = 600;
-    private static final List<Integer> BLOCK_SIZES = asList(10, 6, 5, 4, 3, 2);
-    private static final int CANVASES = ColourDecoder.values().length
+    public static final List<Integer> BLOCK_SIZES = asList(10, 6, 5, 4, 3, 2);
+    public static final int CANVASES = ColourDecoder.values().length
             * PathAlgorithm.values().length
             * BLOCK_SIZES.size();
 
@@ -56,7 +58,7 @@ public class BinaryDataVisualization extends Application {
         return DemoColours.stream().parallel().flatMap(colourDecoder ->
                 PathAlgorithm.stream().parallel().flatMap(pathAlgorithm ->
                         BLOCK_SIZES.stream().map(blockSize -> {
-                            out.printf("%.1f %%\n", 100 * paintedCanvases.getAndIncrement() / (double) CANVASES);
+                            out.printf("%.1f %%\n", getPercentagePainted(paintedCanvases));
                             return paint(colourDecoder.apply(bits), pathAlgorithm.apply(blocks(blockSize)), blockSize);
                         })))
                 .collect(toList());
@@ -77,13 +79,13 @@ public class BinaryDataVisualization extends Application {
                 }, (c1, c2) -> c1);
     }
 
-    public Slider getSlider(BorderPane borderPane, List<Canvas> canvases) {
+    public Slider getSlider(Consumer<Canvas> selectedValueConsumer, List<Canvas> canvases) {
         final Slider slider = new Slider(1, canvases.size(), 1);
-        slider.setMajorTickUnit(canvases.size() / ColourDecoder.values().length);
-        slider.setMinorTickCount(1);
         slider.setShowTickMarks(TRUE);
+        slider.setSnapToTicks(TRUE);
+        slider.setBlockIncrement(1);
         slider.valueProperty().addListener((observable, oldValue, newValue) ->
-                runLater(() -> borderPane.setCenter(canvases.get(newValue.intValue() - 1))));
+                selectedValueConsumer.accept(canvases.get(newValue.intValue() - 1)));
         return slider;
     }
 
@@ -92,7 +94,7 @@ public class BinaryDataVisualization extends Application {
         primaryStage.setTitle("Binary data visualization");
         final BorderPane borderPane = new BorderPane(canvases.get(0));
         borderPane.setPadding(new Insets(5));
-        borderPane.setBottom(getSlider(borderPane, canvases));
+        borderPane.setBottom(getSlider(selectedCanvas -> runLater(() -> borderPane.setCenter(selectedCanvas)), canvases));
         primaryStage.setScene(new Scene(borderPane));
         return primaryStage;
     }

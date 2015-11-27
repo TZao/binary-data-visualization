@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -16,6 +17,7 @@ import static java.lang.System.err;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.generate;
+import static zaoral.gamesys.devchallenges.bdv.BinaryDataVisualization.CANVASES;
 import static zaoral.gamesys.devchallenges.bdv.BinaryDataVisualization.CANVAS_SIZE;
 
 public class Utils {
@@ -71,5 +73,9 @@ public class Utils {
 
     public static int blocks(int blockSize) {
         return CANVAS_SIZE / blockSize;
+    }
+
+    public static double getPercentagePainted(AtomicInteger paintedCanvases) {
+        return 100 * paintedCanvases.getAndIncrement() / (double) CANVASES;
     }
 }
