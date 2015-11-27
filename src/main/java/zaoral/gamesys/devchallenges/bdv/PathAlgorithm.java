@@ -50,12 +50,9 @@ public enum PathAlgorithm implements Function<Integer, Stream<Coordinates>> {
                         }
                     });
         }
-    }, ROW_FIRST {
-        @Override
-        public Stream<Coordinates> apply(Integer blocks) {
-            return iterate(new Coordinates(0, 0), p -> (p.getX() == blocks - 1)
-                    ? new Coordinates(0, p.getY() + 1)
-                    : new Coordinates(p.getX() + 1, p.getY()));
-        }
+    };
+
+    public static Stream<PathAlgorithm> stream() {
+        return Stream.of(PathAlgorithm.values());
     }
 }
