@@ -13,8 +13,7 @@ import static javafx.scene.paint.Color.grayRgb;
 import static javafx.scene.paint.Color.rgb;
 
 public enum ColourDecoder implements Function<Iterable<Boolean>, Stream<Color>> {
-
-    BLACK_AND_WHITE {
+    B_W {
         @Override
         public Stream<Color> apply(Iterable<Boolean> bits) {
             final Iterator<Boolean> bitIt = bits.iterator();
